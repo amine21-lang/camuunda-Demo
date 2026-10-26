@@ -1,0 +1,10 @@
+com\example\camundademo\service\RequestStatusStore$Entry.class
+com\example\camundademo\dto\StartRequest.class
+com\example\camundademo\dto\UserBody.class
+com\example\camundademo\controller\WorkflowController.class
+com\example\camundademo\service\WorkflowService.class
+com\example\camundademo\controller\MockExternalApiController.class
+com\example\camundademo\dto\SubmitBody.class
+com\example\camundademo\dto\StatusUpdate.class
+com\example\camundademo\service\RequestStatusStore.class
+com\example\camundademo\CamundaDemoApplication.class

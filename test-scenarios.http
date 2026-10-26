@@ -1,0 +1,68 @@
+### Variables
+@host = http://localhost:8080
+
+### 1) Le service externe reçoit une requête -> lance le workflow (1 "jour" = 10 s)
+POST {{host}}/mock-api/requests
+Content-Type: application/json
+
+{
+  "idRequest": "REQ-1001",
+  "traderFirstName": "Test",
+  "traderLastName": "Trader",
+  "traderEmail": "trader@exemple.com",
+  "marketId": "MKT01",
+  "marketName": "Marché test",
+  "testMode": true,
+  "testIntervalSeconds": 10
+}
+
+### 2) Etat du workflow (tâches actives, variables)
+GET {{host}}/api/requests/REQ-1001
+
+### 3) Emails simulés
+GET {{host}}/api/requests/REQ-1001/emails
+
+### 4) "Assign to me" par alice
+POST {{host}}/api/requests/REQ-1001/team/claim
+Content-Type: application/json
+
+{ "userId": "alice" }
+
+### 5) Un autre opérateur essaie de prendre la même demande -> 409 attendu
+POST {{host}}/api/requests/REQ-1001/team/claim
+Content-Type: application/json
+
+{ "userId": "bob" }
+
+### 6) Submit SANS cocher la confirmation -> retour à la même tâche (nouvelle tâche non assignée)
+POST {{host}}/api/requests/REQ-1001/team/submit
+Content-Type: application/json
+
+{ "userId": "alice", "confirmOnBehalf": false }
+
+### 7) Re-claim puis Submit AVEC confirmation -> statut WAITING_TRADER + email trader
+POST {{host}}/api/requests/REQ-1001/team/claim
+Content-Type: application/json
+
+{ "userId": "alice" }
+
+###
+POST {{host}}/api/requests/REQ-1001/team/submit
+Content-Type: application/json
+
+{ "userId": "alice", "confirmOnBehalf": true }
+
+### 8) Statut côté service externe
+GET {{host}}/mock-api/requests/REQ-1001
+
+### 9a) Cas nominal : le trader confirme -> COMPLETED, rappels stoppés
+POST {{host}}/api/requests/REQ-1001/trader/confirm
+
+### 9b) Cas expiration : ne rien faire ~50 s (5 x 10 s) puis consulter emails + statut -> EXPIRED
+GET {{host}}/api/requests/REQ-1001/emails
+
+### 10) Panne du service externe -> le Submit crée un incident (Cockpit)
+POST {{host}}/mock-api/fail?enabled=true
+
+###
+POST {{host}}/mock-api/fail?enabled=false

@@ -1,0 +1,28 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:camunda;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ""
+  h2:
+    console:
+      enabled: true        # http://localhost:8080/h2-console
+
+camunda:
+  bpm:
+    admin-user:            # connexion à Cockpit / Tasklist : demo / demo
+      id: demo
+      password: demo
+      first-name: Demo
+    filter:
+      create: Toutes les tâches
+    job-execution:
+      enabled: true        # indispensable pour les timers (rappels)
+
+demo:
+  # URL du "service externe" simulé (voir MockExternalApiController)
+  mock-api-base-url: http://localhost:8080/mock-api
+  # base des liens mis dans les emails simulés
+  app-base-url: http://localhost:8080/api/requests
